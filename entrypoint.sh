@@ -17,33 +17,8 @@ if [ ! -S /var/run/docker.sock ]; then
   error "Docker socket is missing? Please bind /var/run/docker.sock in your compose file." && exit 13
 fi
 
-net="casa-net"
-export REF_NET="$net"
-export REF_SEPARATOR="-"
-
-if ! docker network inspect "$net" &>/dev/null; then
-  if ! docker network create --driver=bridge --subnet="10.22.0.0/16" "$net" >/dev/null; then
-    error "Failed to create network '$net'!" && exit 14
-  fi
-  if ! docker network inspect "$net" &>/dev/null; then
-    error "Network '$net' does not exist?" && exit 15
-  fi
-fi
-
 target=$(hostname -s)
-
-if ! docker inspect "$target" &>/dev/null; then
-  error "Failed to find a container with name: '$target'!" && exit 16
-fi
-
 resp=$(docker inspect "$target")
-network=$(echo "$resp" | jq -r '.[0].NetworkSettings.Networks["casa-net"]')
-
-if [ -z "$network" ] || [[ "$network" == "null" ]]; then
-  if ! docker network connect "$net" "$target"; then
-    error "Failed to connect container to network '$net'!" && exit 17
-  fi
-fi
 
 mount=$(echo "$resp" | jq -r '.[0].Mounts[] | select(.Destination == "/DATA").Source')
 

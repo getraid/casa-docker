@@ -1,7 +1,7 @@
 ############################################################################################################
 # Build the Go binary for the Gateway
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-gateway
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-gateway
 
 WORKDIR /app
 
@@ -18,7 +18,8 @@ COPY ./CasaOS-Gateway/service ./service
 COPY ./CasaOS-Gateway/build ./build
 COPY ./CasaOS-Gateway/main.go ./main.go
 
-RUN go build -o casaos-gateway .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-gateway .
 
 # default config
 COPY ./CasaOS-Gateway/build/sysroot/etc/casaos/gateway.ini.sample /etc/casaos/gateway.ini
@@ -27,7 +28,7 @@ RUN mkdir -p /var/run/casaos/ && echo -n "{}" >> /var/run/casaos/routes.json
 ############################################################################################################
 # Build the Go binary for the User Service
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-user-service
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-user-service
 
 WORKDIR /app
 
@@ -46,7 +47,6 @@ RUN mkdir -p codegen/message_bus && \
     go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 \
     -package message_bus https://raw.githubusercontent.com/IceWhaleTech/CasaOS-MessageBus/main/api/message_bus/openapi.yaml > codegen/message_bus/api.go
 
-
 COPY ./CasaOS-UserService/build ./build
 COPY ./CasaOS-UserService/cmd ./cmd
 COPY ./CasaOS-UserService/common ./common
@@ -56,7 +56,8 @@ COPY ./CasaOS-UserService/route ./route
 COPY ./CasaOS-UserService/service ./service
 COPY ./CasaOS-UserService/main.go ./main.go
 
-RUN go build -o casaos-user-service .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-user-service .
 
 # default config
 COPY ./CasaOS-UserService/build/sysroot/etc/casaos/user-service.conf.sample /etc/casaos/user-service.conf
@@ -64,7 +65,7 @@ COPY ./CasaOS-UserService/build/sysroot/etc/casaos/user-service.conf.sample /etc
 ############################################################################################################
 # Build the Go binary for the MessageBus
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-message-bus
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-message-bus
 
 WORKDIR /app
 
@@ -90,7 +91,8 @@ COPY ./CasaOS-MessageBus/route ./route
 COPY ./CasaOS-MessageBus/service ./service
 COPY ./CasaOS-MessageBus/main.go ./main.go
 
-RUN go build -o casaos-message-bus .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-message-bus .
 
 # default config
 COPY ./CasaOS-MessageBus/build/sysroot/etc/casaos/message-bus.conf.sample /etc/casaos/message-bus.conf
@@ -98,7 +100,7 @@ COPY ./CasaOS-MessageBus/build/sysroot/etc/casaos/message-bus.conf.sample /etc/c
 ############################################################################################################
 # Build the Go binary for the AppManagement
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-app-management
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-app-management
 
 WORKDIR /app
 
@@ -117,7 +119,6 @@ RUN mkdir -p codegen/message_bus && \
     go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 \
     -generate types,client -package message_bus https://raw.githubusercontent.com/IceWhaleTech/CasaOS-MessageBus/main/api/message_bus/openapi.yaml > codegen/message_bus/api.go
 
-    
 COPY ./CasaOS-AppManagement/build ./build
 COPY ./CasaOS-AppManagement/service ./service
 COPY ./CasaOS-AppManagement/route ./route
@@ -127,7 +128,8 @@ COPY ./CasaOS-AppManagement/common ./common
 COPY ./CasaOS-AppManagement/cmd ./cmd
 COPY ./CasaOS-AppManagement/main.go ./main.go
 
-RUN go build -o casaos-app-management .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-app-management .
 
 # default config
 COPY ./CasaOS-AppManagement/build/sysroot/etc/casaos/app-management.conf.sample /etc/casaos/app-management.conf
@@ -136,7 +138,7 @@ COPY ./CasaOS-AppManagement/build/sysroot/etc/casaos/env /etc/casaos/env
 ############################################################################################################
 # Build the Go binary for the LocalStorage
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-local-storage
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-local-storage
 
 WORKDIR /app
 
@@ -155,7 +157,7 @@ RUN mkdir -p codegen/message_bus && \
     go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 \
     -generate types,client -package message_bus https://raw.githubusercontent.com/IceWhaleTech/CasaOS-MessageBus/main/api/message_bus/openapi.yaml > codegen/message_bus/api.go
 
-    
+
 COPY ./CasaOS-LocalStorage/build ./build
 COPY ./CasaOS-LocalStorage/cmd ./cmd
 COPY ./CasaOS-LocalStorage/common ./common
@@ -168,7 +170,8 @@ COPY ./CasaOS-LocalStorage/service ./service
 COPY ./CasaOS-LocalStorage/main.go ./main.go
 COPY ./CasaOS-LocalStorage/misc.go ./misc.go
 
-RUN go build -o casaos-local-storage .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-local-storage .
 
 # default config
 COPY ./CasaOS-LocalStorage/build/sysroot/etc/casaos/local-storage.conf.sample /etc/casaos/local-storage.conf
@@ -176,7 +179,9 @@ COPY ./CasaOS-LocalStorage/build/sysroot/etc/casaos/local-storage.conf.sample /e
 ############################################################################################################
 # Build the Go binary for the UI
 ############################################################################################################
-FROM node:16 AS builder-casaos-ui
+FROM --platform=$BUILDPLATFORM node:16 AS builder-casaos-ui
+
+ENV NODE_ENV=production
 
 WORKDIR /app
 
@@ -186,15 +191,16 @@ COPY ./CasaOS-UI/.yarnrc.yml .
 COPY ./CasaOS-UI/.yarn ./.yarn
 COPY ./CasaOS-UI/main/package.json ./main/package.json
 
-RUN yarn install
+RUN yarn install --network-timeout 1000000
 
 COPY ./CasaOS-UI .
+
 RUN yarn build
 
 ############################################################################################################
 # Build the Go binary for the CasaOS Main
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-main
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-main
 
 WORKDIR /app
 
@@ -212,7 +218,7 @@ RUN mkdir -p codegen && \
 RUN mkdir -p codegen/message_bus && \
     go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.12.4 \
     -generate types,client -package message_bus https://raw.githubusercontent.com/IceWhaleTech/CasaOS-MessageBus/main/api/message_bus/openapi.yaml > codegen/message_bus/api.go
-    
+
 COPY ./CasaOS/build ./build
 COPY ./CasaOS/cmd ./cmd
 COPY ./CasaOS/common ./common
@@ -226,7 +232,8 @@ COPY ./CasaOS/service ./service
 COPY ./CasaOS/types ./types
 COPY ./CasaOS/main.go ./main.go
 
-RUN go build -o casaos-main .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-main .
 
 # default config
 COPY ./CasaOS/build/sysroot/etc/casaos/casaos.conf.sample /etc/casaos/casaos.conf
@@ -234,7 +241,7 @@ COPY ./CasaOS/build/sysroot/etc/casaos/casaos.conf.sample /etc/casaos/casaos.con
 ############################################################################################################
 # Build the Go binary for the CasaOS Cli
 ############################################################################################################
-FROM golang:1.21-alpine AS builder-casaos-cli
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder-casaos-cli
 
 WORKDIR /app
 
@@ -264,26 +271,34 @@ COPY ./CasaOS-CLI/build ./build
 COPY ./CasaOS-CLI/cmd ./cmd
 COPY ./CasaOS-CLI/main.go ./main.go
 
-RUN go build -o casaos-cli .
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -o casaos-cli .
 
 ############################################################################################################
 # Build the final image
 ############################################################################################################
-FROM ubuntu:24.04
 
-# Install required packages
-RUN apt-get update && apt-get install -y wget curl smartmontools parted ntfs-3g net-tools udevil samba cifs-utils mergerfs unzip openssh-server
+FROM debian:bookworm-slim AS casaos
 
-# install docker https://docs.docker.com/engine/install/ubuntu/
-RUN curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
+ARG TARGETARCH
+ARG VERSION_ARG="0.0"
+ARG DEBCONF_NOWARNINGS="yes"
+ARG DEBIAN_FRONTEND="noninteractive"
+ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 
+RUN set -eu \
+  && apt-get update -y \
+  && apt-get --no-install-recommends -y install jq tini gnupg wget curl smartmontools parted ntfs-3g net-tools udevil samba cifs-utils mergerfs unzip openssh-server ca-certificates \
+  && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+  && apt-get update -y \
+  && apt-get --no-install-recommends -y install docker-ce-cli docker-compose-plugin \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+  && echo "$VERSION_ARG" > /run/version
 
 # Set environment variables
 ENV GO_ENV=production
-ENV REF_SEPARATOR=-
-#ENV REF_SCHEME=https
-#ENV REF_PORT=443
-
 
 # Set the Current Working Directory inside the container
 WORKDIR /root/
@@ -293,7 +308,6 @@ COPY --from=builder-casaos-gateway /app/casaos-gateway .
 #COPY --from=builder-casaos-gateway /etc/casaos/gateway.ini /etc/casaos/gateway.ini
 COPY ./conf/gateway/gateway.ini /etc/casaos/gateway.ini
 COPY --from=builder-casaos-gateway /var/run/casaos/routes.json /var/run/casaos/routes.json
-
 
 # Copy the Pre-built binary file and configuration files from the app-management
 COPY --from=builder-casaos-app-management /app/casaos-app-management .
@@ -318,8 +332,7 @@ COPY ./conf/local-storage/local-storage.conf /etc/casaos/local-storage.conf
 
 #COPY ui /var/lib/casaos/www and other initial files
 COPY --from=builder-casaos-ui /app/build/sysroot/var/lib/casaos/ /var/lib/casaos/
-COPY ./CasaOS-UI/main/register-ui-events.sh ./register-ui-events.sh
-RUN chmod +x ./register-ui-events.sh
+COPY --chmod=755 ./CasaOS-UI/main/register-ui-events.sh ./register-ui-events.sh
 
 # Copy CasaOS-AppStore
 #COPY ./appstore-data/main/build/sysroot/var/lib/casaos/appstore/default.new /var/lib/casaos/appstore/default
@@ -328,19 +341,17 @@ COPY ./CasaOS-AppStore/*.json /var/lib/casaos/appstore/default/
 
 # Copy the Pre-built binary file and configuration files from the main
 COPY --from=builder-casaos-main /app/casaos-main .
-#COPY --from=builder-casaos-main /etc/casaos/casaos.conf /etc/casaos/casaos.conf
+COPY --from=builder-casaos-main /app/build/sysroot/usr/share/casaos/shell/ /usr/share/casaos/shell
+RUN chmod +x /usr/share/casaos/shell/*.sh
+
 COPY ./conf/casaos/casaos.conf /etc/casaos/casaos.conf
 
 # Copy the Pre-built binary file from the cli
 COPY --from=builder-casaos-cli /app/casaos-cli .
-
-COPY ./entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh
+COPY --chmod=755 ./entrypoint.sh ./entrypoint.sh
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
 
 # Command to run the executable
-ENTRYPOINT ["/root/entrypoint.sh"]
-
-#Note persistent volume to be mounted on /root/DATA
+ENTRYPOINT ["/usr/bin/tini", "-s", "/root/entrypoint.sh"]
