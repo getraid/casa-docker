@@ -7,11 +7,35 @@
 [![Version]][tag_url]
 [![Size]][tag_url]
 [![Package]][pkg_url]
-[![Pulls]][hub_url]
+[![Pulls]][hub_url]s
 
 </div></h1>
 
 Docker container of [CasaOS](https://casaos.io/) (an OS for self-hosting).
+
+
+## About this fork
+I was trying to setup Casa as a docker container with OrbStack on my Mac Mini M4 home server.   
+The main app worked with [dockurs version](https://github.com/dockur/casa) previously as well.  
+But once I installed an app, it was only be visible on the local domain (which was *.docker.orb.local) and couldn't be opened from another machine.  
+Thats why I removed some chunks of the init script and rebuilt a new docker image.  
+
+Just clone the repo and run `docker build -t casademo .` and afterwards create and run this docker compose with `docker-compose up -d`.
+Replace `PLACEHOLDER` with your local data dir path (meaning a path to a newly created folder if you don't have one yet):
+```yaml
+services:
+  casa:
+    image: casademo
+    container_name: casa
+    ports:
+      - 8080:8080
+    volumes:
+      - PLACEHOLDER:/DATA"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    stop_grace_period: 1m
+```
+
+
 
 ## Features ✨
 

@@ -6,6 +6,28 @@ This project aims to deliver CasaOS (https://github.com/IceWhaleTech/CasaOS) as 
 - Docker must be installed on the host (works on Windows and Linux host)
 - At least 150MB of RAM
 
+## About this fork
+I was trying to setup Casa as a docker container with OrbStack on my Mac Mini M4 home server.   
+The main app worked with [dockurs version](https://github.com/dockur/casa) previously as well.  
+But once I installed an app, it was only be visible on the local domain (which was *.docker.orb.local) and couldn't be opened from another machine.  
+Thats why I removed some chunks of the init script and rebuilt a new docker image.  
+
+Just clone the repo and run `docker build -t casademo .` and afterwards create and run this docker compose with `docker-compose up -d`.
+Replace `PLACEHOLDER` with your local data dir path (meaning a path to a newly created folder if you don't have one yet):
+```yaml
+services:
+  casa:
+    image: casademo
+    container_name: casa
+    ports:
+      - 8080:8080
+    volumes:
+      - PLACEHOLDER:/DATA"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    stop_grace_period: 1m
+```
+
+
 ## Getting Started
 
 The image is now available on DockerHub! You can either pull the official image or build it yourself.
@@ -67,11 +89,11 @@ CasaIMG provides environment variables to configure how new containers started b
 
 ### Environment Variables
 
-| Variable | Description | Example | Default |
-|----------|-------------|---------|---------|
-| REF_NET | Docker network to attach new containers to | `meta` | `bridge` |
-| REF_PORT | Default published port for container web interfaces | `80` | Container's default |
-| REF_DOMAIN | Base domain for automatic subdomain generation | `domain.com` | none |
+| Variable   | Description                                         | Example      | Default             |
+| ---------- | --------------------------------------------------- | ------------ | ------------------- |
+| REF_NET    | Docker network to attach new containers to          | `meta`       | `bridge`            |
+| REF_PORT   | Default published port for container web interfaces | `80`         | Container's default |
+| REF_DOMAIN | Base domain for automatic subdomain generation      | `domain.com` | none                |
 
 ### Domain Configuration Example
 
@@ -170,17 +192,17 @@ npx dockflow build
 
 This project integrates various CasaOS components as submodules. Each submodule is tracked at a specific version to ensure stability and compatibility.
 
-| Component | Branch | Version | Upstream Repository |
-|-----------|---------|--------|-------------------|
-| CasaOS | main | v0.4.13 | [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS) |
-| CasaOS-AppManagement | casa-img | | [IceWhaleTech/CasaOS-AppManagement](https://github.com/IceWhaleTech/CasaOS-AppManagement) |
-| CasaOS-AppStore | main | no version | [IceWhaleTech/CasaOS-AppStore](https://github.com/IceWhaleTech/CasaOS-AppStore) |
-| CasaOS-Gateway | main | v0.4.8 | [IceWhaleTech/CasaOS-Gateway](https://github.com/IceWhaleTech/CasaOS-Gateway) |
-| CasaOS-LocalStorage | main | v0.4.5-2 | [IceWhaleTech/CasaOS-LocalStorage](https://github.com/IceWhaleTech/CasaOS-LocalStorage) |
-| CasaOS-MessageBus | main | v0.4.5 | [IceWhaleTech/CasaOS-MessageBus](https://github.com/IceWhaleTech/CasaOS-MessageBus) |
-| CasaOS-UI | casa-img | | [IceWhaleTech/CasaOS-UI](https://github.com/IceWhaleTech/CasaOS-UI) |
-| CasaOS-UserService | casa-img | | [IceWhaleTech/CasaOS-UserService](https://github.com/IceWhaleTech/CasaOS-UserService) |
-| CasaOS-CLI | main | v0.4.4 | [IceWhaleTech/CasaOS-CLI](https://github.com/IceWhaleTech/CasaOS-CLI) |
+| Component            | Branch   | Version    | Upstream Repository                                                                       |
+| -------------------- | -------- | ---------- | ----------------------------------------------------------------------------------------- |
+| CasaOS               | main     | v0.4.13    | [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS)                             |
+| CasaOS-AppManagement | casa-img |            | [IceWhaleTech/CasaOS-AppManagement](https://github.com/IceWhaleTech/CasaOS-AppManagement) |
+| CasaOS-AppStore      | main     | no version | [IceWhaleTech/CasaOS-AppStore](https://github.com/IceWhaleTech/CasaOS-AppStore)           |
+| CasaOS-Gateway       | main     | v0.4.8     | [IceWhaleTech/CasaOS-Gateway](https://github.com/IceWhaleTech/CasaOS-Gateway)             |
+| CasaOS-LocalStorage  | main     | v0.4.5-2   | [IceWhaleTech/CasaOS-LocalStorage](https://github.com/IceWhaleTech/CasaOS-LocalStorage)   |
+| CasaOS-MessageBus    | main     | v0.4.5     | [IceWhaleTech/CasaOS-MessageBus](https://github.com/IceWhaleTech/CasaOS-MessageBus)       |
+| CasaOS-UI            | casa-img |            | [IceWhaleTech/CasaOS-UI](https://github.com/IceWhaleTech/CasaOS-UI)                       |
+| CasaOS-UserService   | casa-img |            | [IceWhaleTech/CasaOS-UserService](https://github.com/IceWhaleTech/CasaOS-UserService)     |
+| CasaOS-CLI           | main     | v0.4.4     | [IceWhaleTech/CasaOS-CLI](https://github.com/IceWhaleTech/CasaOS-CLI)                     |
 ## Support
 
 Need help? Join our Discord community: [https://discord.gg/QJyuNDXuFa](https://discord.gg/QJyuNDXuFa)
